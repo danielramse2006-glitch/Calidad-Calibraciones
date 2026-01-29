@@ -28,8 +28,8 @@ const COLUMNS = [
 
 // Inicializar cuando carga la página
 document.addEventListener('DOMContentLoaded', function() {
-    // Cargar datos desde localStorage si existen
-    loadFromLocalStorage();
+    // Cargar datos automáticamente desde el archivo Excel
+    loadExcelFromRepo();
     
     // Event listener para búsqueda en tiempo real
     document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -50,53 +50,61 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Cargar archivo Excel
-function loadExcelFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+// Cargar archivo Excel desde el repositorio
+function loadExcelFromRepo() {
+    const excelFileName = 'Lista_Master_de_equipos_de_calibracion_2025.xlsx';
     
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            
-            // Leer la primera hoja
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            
-            // Convertir a JSON, empezando desde la fila 4 (índice 3)
-            const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
-                range: 3, // Empezar desde la fila 4 (0-indexed, por eso es 3)
-                header: COLUMNS,
-                defval: ''
-            });
-            
-            equiposData = jsonData.map((item, index) => {
-                // Asegurar que No sea consecutivo
-                item.No = index + 1;
-                return item;
-            });
-            
-            filteredData = [...equiposData];
-            
-            // Guardar en localStorage
-            saveToLocalStorage();
-            
-            // Actualizar la interfaz
-            renderTable();
-            updateStats();
-            populateFilterOptions();
-            
-            alert(`✅ Archivo cargado exitosamente: ${equiposData.length} registros`);
-        } catch (error) {
-            console.error('Error al leer el archivo:', error);
-            alert('❌ Error al leer el archivo Excel. Verifica el formato.');
-        }
-    };
-    
-    reader.readAsArrayBuffer(file);
+    fetch(excelFileName)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('No se pudo cargar el archivo Excel');
+            }
+            return response.arrayBuffer();
+        })
+        .then(data => {
+            try {
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Leer la primera hoja
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                
+                // Convertir a JSON, empezando desde la fila 4 (índice 3)
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
+                    range: 3, // Empezar desde la fila 4 (0-indexed, por eso es 3)
+                    header: COLUMNS,
+                    defval: ''
+                });
+                
+                equiposData = jsonData.map((item, index) => {
+                    // Asegurar que No sea consecutivo
+                    item.No = index + 1;
+                    return item;
+                });
+                
+                filteredData = [...equiposData];
+                
+                // Guardar en localStorage
+                saveToLocalStorage();
+                
+                // Actualizar la interfaz
+                renderTable();
+                updateStats();
+                populateFilterOptions();
+                
+                console.log(`✅ Archivo cargado exitosamente: ${equiposData.length} registros`);
+            } catch (error) {
+                console.error('Error al procesar el archivo:', error);
+                alert('❌ Error al procesar el archivo Excel. Verifica el formato.');
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar el archivo:', error);
+            // Si falla, intentar cargar desde localStorage
+            loadFromLocalStorage();
+        });
 }
 
+// Cargar archivo Excel
 // Guardar en localStorage
 function saveToLocalStorage() {
     try {
