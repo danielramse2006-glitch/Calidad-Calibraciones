@@ -14,7 +14,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
         }
@@ -29,7 +29,7 @@
         }
         
         header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -77,28 +77,48 @@
         }
         
         .btn-primary {
-            background: #667eea;
+            background: #1e3799;
             color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0c2461;
         }
         
         .btn-success {
-            background: #10b981;
+            background: #27ae60;
             color: white;
+        }
+        
+        .btn-success:hover {
+            background: #219653;
         }
         
         .btn-warning {
-            background: #f59e0b;
+            background: #f39c12;
             color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
         }
         
         .btn-danger {
-            background: #ef4444;
+            background: #e74c3c;
             color: white;
         }
         
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
         .btn-info {
-            background: #3b82f6;
+            background: #3498db;
             color: white;
+        }
+        
+        .btn-info:hover {
+            background: #2980b9;
         }
         
         .search-box {
@@ -109,7 +129,7 @@
         .search-box input {
             width: 100%;
             padding: 12px 20px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #dfe6e9;
             border-radius: 8px;
             font-size: 1em;
             transition: border-color 0.3s;
@@ -117,11 +137,11 @@
         
         .search-box input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #1e3799;
         }
         
         .filters-container {
-            background: #f9fafb;
+            background: #f1f2f6;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -137,7 +157,7 @@
         .filter-item label {
             display: block;
             font-size: 0.9em;
-            color: #6b7280;
+            color: #2c3e50;
             margin-bottom: 5px;
             font-weight: 600;
         }
@@ -146,13 +166,13 @@
         .filter-item input {
             width: 100%;
             padding: 8px 12px;
-            border: 1px solid #d1d5db;
+            border: 1px solid #bdc3c7;
             border-radius: 6px;
             font-size: 0.95em;
         }
         
         .stats-bar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
             color: white;
             padding: 15px 20px;
             border-radius: 8px;
@@ -181,7 +201,7 @@
         .table-container {
             overflow-x: auto;
             border-radius: 8px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid #dfe6e9;
         }
         
         table {
@@ -191,7 +211,8 @@
         }
         
         thead {
-            background: #f3f4f6;
+            background: #2c3e50;
+            color: white;
             position: sticky;
             top: 0;
             z-index: 10;
@@ -201,14 +222,13 @@
             padding: 12px;
             text-align: left;
             font-weight: 600;
-            color: #374151;
-            border-bottom: 2px solid #d1d5db;
+            border-bottom: 2px solid #1e3799;
             white-space: nowrap;
         }
         
         td {
             padding: 10px 12px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #dfe6e9;
         }
         
         tbody tr {
@@ -217,11 +237,12 @@
         }
         
         tbody tr:hover {
-            background-color: #f9fafb;
+            background-color: #f8f9fa;
         }
         
         tbody tr.selected {
-            background-color: #dbeafe;
+            background-color: #e3f2fd;
+            border-left: 4px solid #1e3799;
         }
         
         .status-badge {
@@ -229,21 +250,27 @@
             border-radius: 12px;
             font-size: 0.85em;
             font-weight: 600;
+            white-space: nowrap;
         }
         
         .status-vigente {
-            background: #d1fae5;
-            color: #065f46;
+            background: #27ae60;
+            color: white;
         }
         
         .status-vencido {
-            background: #fee2e2;
-            color: #991b1b;
+            background: #e74c3c;
+            color: white;
         }
         
         .status-proximo {
-            background: #fef3c7;
-            color: #92400e;
+            background: #f39c12;
+            color: white;
+        }
+        
+        .status-sin-fecha {
+            background: #7f8c8d;
+            color: white;
         }
         
         .modal {
@@ -268,7 +295,7 @@
         }
         
         .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
             color: white;
             padding: 20px 30px;
             border-radius: 12px 12px 0 0;
@@ -316,7 +343,7 @@
         .form-group label {
             font-weight: 600;
             margin-bottom: 8px;
-            color: #374151;
+            color: #2c3e50;
             font-size: 0.9em;
         }
         
@@ -324,7 +351,7 @@
         .form-group select,
         .form-group textarea {
             padding: 10px 14px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid #dfe6e9;
             border-radius: 6px;
             font-size: 1em;
             transition: border-color 0.3s;
@@ -334,7 +361,7 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #1e3799;
         }
         
         .form-group textarea {
@@ -344,16 +371,20 @@
         
         .modal-footer {
             padding: 20px 30px;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid #dfe6e9;
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
         
+        .modal-footer .btn {
+            min-width: 100px;
+        }
+        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #6b7280;
+            color: #7f8c8d;
         }
         
         .empty-state svg {
@@ -361,6 +392,12 @@
             height: 100px;
             margin-bottom: 20px;
             opacity: 0.5;
+            stroke: #3498db;
+        }
+        
+        .empty-state h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
         }
         
         @media (max-width: 768px) {
@@ -374,6 +411,14 @@
             
             .search-box {
                 width: 100%;
+            }
+            
+            .stats-bar {
+                justify-content: center;
+            }
+            
+            .stat-item {
+                min-width: 120px;
             }
         }
     </style>
@@ -438,6 +483,7 @@
                             <option value="vigente">Vigente</option>
                             <option value="proximo">Próximo a Vencer (30 días)</option>
                             <option value="vencido">Vencido</option>
+                            <option value="sin-fecha">Sin Fecha</option>
                         </select>
                     </div>
                 </div>
@@ -522,7 +568,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-success" onclick="saveNew()">Guardar</button>
-                <button class="btn" onclick="closeModal('modalNew')" style="background: #6b7280; color: white;">Cancelar</button>
+                <button class="btn btn-primary" onclick="closeModal('modalNew')">Cancelar</button>
             </div>
         </div>
     </div>
@@ -546,7 +592,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-warning" id="btnUpdate" onclick="saveUpdate()" style="display: none;">Actualizar</button>
-                <button class="btn" onclick="closeModal('modalUpdate')" style="background: #6b7280; color: white;">Cancelar</button>
+                <button class="btn btn-primary" onclick="closeModal('modalUpdate')">Cancelar</button>
             </div>
         </div>
     </div>
@@ -564,12 +610,12 @@
                     <input type="text" id="deleteSearch" placeholder="Ingresa ID o Nombre del Equipo">
                     <button class="btn btn-primary" onclick="searchForDelete()" style="margin-top: 10px;">Buscar</button>
                 </div>
-                <div id="deleteInfo" style="display: none; margin-top: 20px; padding: 20px; background: #fee2e2; border-radius: 8px; border: 2px solid #ef4444;">
+                <div id="deleteInfo" style="display: none; margin-top: 20px; padding: 20px; background: #ffeaea; border-radius: 8px; border: 2px solid #e74c3c;">
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger" id="btnDelete" onclick="confirmDelete()" style="display: none;">Confirmar Eliminación</button>
-                <button class="btn" onclick="closeModal('modalDelete')" style="background: #6b7280; color: white;">Cancelar</button>
+                <button class="btn btn-primary" onclick="closeModal('modalDelete')">Cancelar</button>
             </div>
         </div>
     </div>
