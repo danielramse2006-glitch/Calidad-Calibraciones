@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Calibraciones</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>Sistema de Calibraciones - Importar JSON</title>
     <style>
         * {
             margin: 0;
@@ -17,10 +16,11 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             min-height: 100vh;
             padding: 20px;
+            color: #333;
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -50,13 +50,162 @@
             padding: 30px;
         }
         
-        .top-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-            align-items: center;
+        .import-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
+        
+        .import-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e1ecff;
+        }
+        
+        .import-header h2 {
+            color: #003366;
+            margin-bottom: 10px;
+        }
+        
+        .import-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .warning-box h4 {
+            color: #856404;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        
+        .warning-box ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .warning-box li {
+            margin-bottom: 5px;
+        }
+        
+        .file-upload-area {
+            border: 3px dashed #0099cc;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8fbff;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .file-upload-area:hover {
+            background: #f0f7ff;
+            border-color: #0056a9;
+        }
+        
+        .file-upload-area.dragover {
+            background: #e8f4ff;
+            border-color: #003366;
+        }
+        
+        .file-info {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .preview-container {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .preview-table th {
+            background: #2c3e50;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .preview-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .preview-table tr:hover {
+            background: #e8f4ff;
+        }
+        
+        .progress-container {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .log-area {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            display: none;
+        }
+        
+        .log-area .success { color: #2ecc71; }
+        .log-area .error { color: #e74c3c; }
+        .log-area .warning { color: #f39c12; }
+        .log-area .info { color: #3498db; }
         
         .btn {
             padding: 12px 24px;
@@ -94,15 +243,6 @@
             background: #219653;
         }
         
-        .btn-warning {
-            background: #f39c12;
-            color: white;
-        }
-        
-        .btn-warning:hover {
-            background: #e67e22;
-        }
-        
         .btn-danger {
             background: #e74c3c;
             color: white;
@@ -121,505 +261,531 @@
             background: #2980b9;
         }
         
-        .search-box {
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        .search-box input {
+        .btn-full {
             width: 100%;
-            padding: 12px 20px;
-            border: 2px solid #dfe6e9;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
+            justify-content: center;
+            padding: 15px;
         }
         
-        .search-box input:focus {
-            outline: none;
-            border-color: #1e3799;
-        }
-        
-        .filters-container {
-            background: #f1f2f6;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .filters-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .filter-item label {
-            display: block;
-            font-size: 0.9em;
-            color: #2c3e50;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .filter-item select,
-        .filter-item input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #bdc3c7;
-            border-radius: 6px;
-            font-size: 0.95em;
-        }
-        
-        .stats-bar {
-            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        .actions-row {
             display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-item .label {
-            font-size: 0.85em;
-            opacity: 0.9;
-        }
-        
-        .stat-item .value {
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-top: 5px;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-            border-radius: 8px;
-            border: 1px solid #dfe6e9;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9em;
-        }
-        
-        thead {
-            background: #2c3e50;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        th {
-            padding: 12px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #1e3799;
-            white-space: nowrap;
-        }
-        
-        td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #dfe6e9;
-        }
-        
-        tbody tr {
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        
-        tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        tbody tr.selected {
-            background-color: #e3f2fd;
-            border-left: 4px solid #1e3799;
-        }
-        
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        
-        .status-vigente {
-            background: #27ae60;
-            color: white;
-        }
-        
-        .status-vencido {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .status-proximo {
-            background: #f39c12;
-            color: white;
-        }
-        
-        .status-sin-fecha {
-            background: #7f8c8d;
-            color: white;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            overflow-y: auto;
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 50px auto;
-            padding: 0;
-            border-radius: 12px;
-            max-width: 800px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        .modal-header {
-            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 12px 12px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h2 {
-            margin: 0;
-        }
-        
-        .close {
-            color: white;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            background: none;
-            border: none;
-        }
-        
-        .close:hover {
-            opacity: 0.8;
-        }
-        
-        .modal-body {
-            padding: 30px;
-        }
-        
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-        
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
-        
-        .form-group label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-size: 0.9em;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 10px 14px;
-            border: 2px solid #dfe6e9;
-            border-radius: 6px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #1e3799;
-        }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        
-        .modal-footer {
-            padding: 20px 30px;
-            border-top: 1px solid #dfe6e9;
-            display: flex;
-            justify-content: flex-end;
             gap: 10px;
+            margin-top: 20px;
         }
         
-        .modal-footer .btn {
-            min-width: 100px;
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #7f8c8d;
-        }
-        
-        .empty-state svg {
-            width: 100px;
-            height: 100px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-            stroke: #3498db;
-        }
-        
-        .empty-state h3 {
-            color: #2c3e50;
-            margin-bottom: 10px;
+        .back-link:hover {
+            text-decoration: underline;
         }
         
         @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .top-bar {
+            .actions-row {
                 flex-direction: column;
             }
             
-            .search-box {
+            .btn {
                 width: 100%;
-            }
-            
-            .stats-bar {
                 justify-content: center;
-            }
-            
-            .stat-item {
-                min-width: 120px;
             }
         }
     </style>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+        
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBzevEAi6PSFwQ7jze0TCicHLACMLlq0jo",
+            authDomain: "calidad-calibraciones.firebaseapp.com",
+            projectId: "calidad-calibraciones",
+            storageBucket: "calidad-calibraciones.firebasestorage.app",
+            messagingSenderId: "707097538176",
+            appId: "1:707097538176:web:bf7f3cea758409c701c065",
+            measurementId: "G-4X900552XJ"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Hacer disponible globalmente
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.query = query;
+        window.where = where;
+        window.serverTimestamp = serverTimestamp;
+    </script>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🔧 Sistema de Calibraciones</h1>
-            <p>Gestión Maestra de Equipos de Calibración</p>
+            <p>Importar datos desde archivo JSON</p>
         </header>
         
         <div class="main-content">
-            <!-- Barra superior con botones y búsqueda -->
-            <div class="top-bar">
-                <button class="btn btn-success" onclick="openNewModal()">
-                    ➕ Nuevo
-                </button>
-                <button class="btn btn-warning" onclick="openUpdateModal()">
-                    ✏️ Actualizar
-                </button>
-                <button class="btn btn-danger" onclick="openDeleteModal()">
-                    🗑️ Eliminar
-                </button>
-                <button class="btn btn-info" onclick="toggleFilters()">
-                    🔍 Filtros
-                </button>
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Buscar por ID, Nombre del Equipo, No. Serie...">
+            <div class="import-container">
+                <div class="import-header">
+                    <h2>📦 Importar JSON a Firebase</h2>
+                    <p>Sube tu archivo JSON para importar equipos de calibración en masa</p>
                 </div>
-                <button class="btn btn-primary" onclick="downloadExcel()">
-                    📥 Descargar Excel
-                </button>
-            </div>
-            
-            <!-- Contenedor de filtros -->
-            <div class="filters-container" id="filtersContainer">
-                <div class="filters-grid">
-                    <div class="filter-item">
-                        <label>Ubicación</label>
-                        <select id="filterUbicacion">
-                            <option value="">Todas</option>
-                        </select>
+
+                <div class="warning-box">
+                    <h4>⚠️ Notas importantes:</h4>
+                    <ul>
+                        <li>Solo archivos JSON (.json) son aceptados</li>
+                        <li>El archivo debe contener un array de objetos con los datos de calibración</li>
+                        <li>Los campos mínimos requeridos son: ID, NOMBRE DEL EQUIPO, VENCIMIENTO CALIBRACIÓN</li>
+                        <li>Los duplicados (por ID o No. SERIE) serán omitidos</li>
+                        <li>Se registrará la importación en el historial de actividad</li>
+                    </ul>
+                </div>
+
+                <!-- Área para arrastrar y soltar archivos -->
+                <div class="file-upload-area" id="dropArea">
+                    <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                    <h3 style="color: #003366; margin: 10px 0;">Arrastra archivo JSON aquí</h3>
+                    <p style="color: #7f8c8d;">o haz clic para seleccionar</p>
+                    <input type="file" id="fileInput" accept=".json" style="display: none;">
+                </div>
+
+                <!-- Información del archivo -->
+                <div class="file-info" id="fileInfo">
+                    <strong>Archivo cargado:</strong> <span id="fileName"></span><br>
+                    <strong>Registros encontrados:</strong> <span id="recordCount">0</span><br>
+                    <strong>Campos detectados:</strong> <span id="fieldCount">0</span>
+                </div>
+
+                <!-- Vista previa de datos -->
+                <div class="preview-container" id="previewContainer">
+                    <h4 style="margin-top: 0; color: #003366; margin-bottom: 10px;">📋 Vista previa (primeros 10 registros):</h4>
+                    <table class="preview-table" id="previewTable">
+                        <thead>
+                            <tr id="previewHeaders"></tr>
+                        </thead>
+                        <tbody id="previewBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Progreso de importación -->
+                <div class="progress-container" id="progressContainer">
+                    <h4 style="color: #003366; margin-bottom: 10px;">Progreso de importación:</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill">0%</div>
                     </div>
-                    <div class="filter-item">
-                        <label>PRP5</label>
-                        <select id="filterPRP5">
-                            <option value="">Todos</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <label>Tipo</label>
-                        <select id="filterTipo">
-                            <option value="">Todos</option>
-                            <option value="Interno">Interno</option>
-                            <option value="Externo">Externo</option>
-                        </select>
-                    </div>
-                    <div class="filter-item">
-                        <label>Estado Calibración</label>
-                        <select id="filterEstado">
-                            <option value="">Todos</option>
-                            <option value="vigente">Vigente</option>
-                            <option value="proximo">Próximo a Vencer (30 días)</option>
-                            <option value="vencido">Vencido</option>
-                            <option value="sin-fecha">Sin Fecha</option>
-                        </select>
+                    <div style="text-align: center; color: #7f8c8d; font-size: 14px;" id="progressText">
+                        Preparando...
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="applyFilters()" style="margin-top: 15px;">
-                    Aplicar Filtros
-                </button>
-            </div>
-            
-            <!-- Barra de estadísticas -->
-            <div class="stats-bar">
-                <div class="stat-item">
-                    <div class="label">Total Equipos</div>
-                    <div class="value" id="statTotal">0</div>
+
+                <!-- Área de logs -->
+                <div class="log-area" id="logArea"></div>
+
+                <!-- Botones de acción -->
+                <div class="actions-row">
+                    <button class="btn btn-success btn-full" id="btnImport" disabled>
+                        INICIAR IMPORTACIÓN
+                    </button>
                 </div>
-                <div class="stat-item">
-                    <div class="label">Vigentes</div>
-                    <div class="value" id="statVigente">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="label">Por Vencer</div>
-                    <div class="value" id="statProximo">0</div>
-                </div>
-                <div class="stat-item">
-                    <div class="label">Vencidos</div>
-                    <div class="value" id="statVencido">0</div>
-                </div>
-            </div>
-            
-            <!-- Tabla de datos -->
-            <div class="table-container">
-                <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>ID</th>
-                            <th>Nombre del Equipo</th>
-                            <th>Modelo</th>
-                            <th>No. Serie</th>
-                            <th>Fabricante</th>
-                            <th>Rango</th>
-                            <th>Ubicación</th>
-                            <th>Responsable</th>
-                            <th>Fecha Calibración</th>
-                            <th>Vencimiento</th>
-                            <th>Precio $</th>
-                            <th>Vencimiento 2 Años</th>
-                            <th>Etiqueta</th>
-                            <th>Certificado</th>
-                            <th>PRP5</th>
-                            <th>Tipo</th>
-                            <th>Notas</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <tr>
-                            <td colspan="19" class="empty-state">
-                                <div>
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    <h3>No hay datos cargados</h3>
-                                    <p>Los datos se cargarán automáticamente desde el Excel del repositorio</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal para Nuevo Registro -->
-    <div id="modalNew" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>➕ Nuevo Equipo</h2>
-                <button class="close" onclick="closeModal('modalNew')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-grid" id="formNew"></div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-success" onclick="saveNew()">Guardar</button>
-                <button class="btn btn-primary" onclick="closeModal('modalNew')">Cancelar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal para Actualizar -->
-    <div id="modalUpdate" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>✏️ Actualizar Equipo</h2>
-                <button class="close" onclick="closeModal('modalUpdate')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Buscar por ID o Nombre</label>
-                    <input type="text" id="updateSearch" placeholder="Ingresa ID o Nombre del Equipo">
-                    <button class="btn btn-primary" onclick="searchForUpdate()" style="margin-top: 10px;">Buscar</button>
-                </div>
-                <div id="updateFormContainer" style="display: none; margin-top: 20px;">
-                    <div class="form-grid" id="formUpdate"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-warning" id="btnUpdate" onclick="saveUpdate()" style="display: none;">Actualizar</button>
-                <button class="btn btn-primary" onclick="closeModal('modalUpdate')">Cancelar</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Modal para Eliminar -->
-    <div id="modalDelete" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>🗑️ Eliminar Equipo</h2>
-                <button class="close" onclick="closeModal('modalDelete')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Buscar por ID o Nombre</label>
-                    <input type="text" id="deleteSearch" placeholder="Ingresa ID o Nombre del Equipo">
-                    <button class="btn btn-primary" onclick="searchForDelete()" style="margin-top: 10px;">Buscar</button>
-                </div>
-                <div id="deleteInfo" style="display: none; margin-top: 20px; padding: 20px; background: #ffeaea; border-radius: 8px; border: 2px solid #e74c3c;">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" id="btnDelete" onclick="confirmDelete()" style="display: none;">Confirmar Eliminación</button>
-                <button class="btn btn-primary" onclick="closeModal('modalDelete')">Cancelar</button>
+
+                <a href="index.html" class="back-link">← Volver al sistema principal</a>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // Variables globales
+        let jsonData = null;
+        let validRecords = [];
+        
+        // Elementos DOM
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const recordCount = document.getElementById('recordCount');
+        const fieldCount = document.getElementById('fieldCount');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewTable = document.getElementById('previewTable');
+        const previewHeaders = document.getElementById('previewHeaders');
+        const previewBody = document.getElementById('previewBody');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const logArea = document.getElementById('logArea');
+        const btnImport = document.getElementById('btnImport');
+        
+        // Mapeo de campos para calibraciones
+        const FIELD_MAPPING = {
+            // Campos principales
+            "ID": "ID",
+            "NOMBRE DEL EQUIPO": "NOMBRE DEL EQUIPO",
+            "Modelo": "Modelo",
+            "No. SERIE": "No. SERIE",
+            "FABRICANTE": "FABRICANTE",
+            "RANGO": "RANGO",
+            "UBICACION": "UBICACION",
+            "RESPONSIBLE": "RESPONSIBLE",
+            
+            // Fechas
+            "Fecha de calibracion": "Fecha de calibracion",
+            "VENCIMIENTO CALIBRACIÓN": "VENCIMIENTO CALIBRACIÓN",
+            "VENCIMIENTO CALIBRACIÓN A 2 ANOS": "VENCIMIENTO CALIBRACIÓN A 2 ANOS",
+            
+            // Información adicional
+            "Precio $": "Precio $",
+            "Etiqueta": "Etiqueta",
+            "Certificado": "Certificado",
+            "PRP5": "PRP5",
+            "Interno / Externo": "Interno / Externo",
+            "Notas": "Notas"
+        };
+        
+        // Función para registrar logs
+        function log(message, type = 'info') {
+            logArea.style.display = 'block';
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = `[${timestamp}] ${message}`;
+            logArea.appendChild(line);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        // Configurar eventos de drag and drop
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.classList.add('dragover');
+        });
+        
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.classList.remove('dragover');
+        });
+        
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        // Manejar archivo cargado
+        function handleFile(file) {
+            if (!file.name.endsWith('.json')) {
+                alert('❌ Por favor selecciona un archivo JSON válido');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    jsonData = JSON.parse(e.target.result);
+                    
+                    if (!Array.isArray(jsonData)) {
+                        alert('❌ El archivo JSON debe contener un array de objetos');
+                        return;
+                    }
+                    
+                    // Mostrar información del archivo
+                    fileName.textContent = file.name;
+                    recordCount.textContent = jsonData.length;
+                    
+                    // Contar campos únicos en los datos
+                    const fields = new Set();
+                    jsonData.forEach(record => {
+                        Object.keys(record).forEach(field => fields.add(field));
+                    });
+                    fieldCount.textContent = fields.size;
+                    
+                    fileInfo.style.display = 'block';
+                    
+                    // Preparar y validar registros
+                    await prepareRecords();
+                    
+                    // Mostrar vista previa
+                    showPreview();
+                    
+                    // Habilitar botón de importación
+                    btnImport.disabled = false;
+                    
+                    log(`✅ Archivo cargado: ${file.name} con ${jsonData.length} registros`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('❌ Error al leer el archivo JSON: ' + error.message);
+                    log(`❌ Error: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Preparar y validar registros
+        async function prepareRecords() {
+            validRecords = [];
+            let skipped = 0;
+            let fieldsMap = new Map();
+            
+            for (const record of jsonData) {
+                // Validar campos mínimos
+                if (!record.ID && !record['NOMBRE DEL EQUIPO']) {
+                    skipped++;
+                    continue;
+                }
+                
+                // Mapear campos
+                const mappedRecord = {};
+                let hasValidData = false;
+                
+                for (const [jsonField, fbField] of Object.entries(FIELD_MAPPING)) {
+                    if (record.hasOwnProperty(jsonField) || record.hasOwnProperty(fbField)) {
+                        // Intentar ambos nombres de campo
+                        let value = record[jsonField] || record[fbField];
+                        
+                        // Limpiar y formatear valores
+                        if (value !== null && value !== undefined) {
+                            if (typeof value === 'string') {
+                                value = value.trim();
+                            }
+                            mappedRecord[fbField] = value;
+                            hasValidData = true;
+                            
+                            // Contar campos utilizados
+                            if (!fieldsMap.has(fbField)) {
+                                fieldsMap.set(fbField, 0);
+                            }
+                            fieldsMap.set(fbField, fieldsMap.get(fbField) + 1);
+                        }
+                    }
+                }
+                
+                // Solo agregar si tiene datos válidos
+                if (hasValidData) {
+                    validRecords.push(mappedRecord);
+                } else {
+                    skipped++;
+                }
+            }
+            
+            // Actualizar conteo de campos
+            fieldCount.textContent = fieldsMap.size;
+            
+            if (skipped > 0) {
+                log(`⚠️ ${skipped} registros omitidos (datos insuficientes)`, 'warning');
+            }
+            
+            log(`✅ ${validRecords.length} registros válidos preparados para importar`, 'success');
+        }
+        
+        // Mostrar vista previa de datos
+        function showPreview() {
+            if (validRecords.length === 0) return;
+            
+            // Obtener primeros 10 registros
+            const previewRecords = validRecords.slice(0, 10);
+            
+            // Obtener campos presentes
+            const fields = Object.keys(previewRecords[0]);
+            
+            // Limpiar tabla previa
+            previewHeaders.innerHTML = '';
+            previewBody.innerHTML = '';
+            
+            // Crear encabezados
+            fields.forEach(field => {
+                const th = document.createElement('th');
+                th.textContent = field;
+                previewHeaders.appendChild(th);
+            });
+            
+            // Crear filas de datos
+            previewRecords.forEach(record => {
+                const tr = document.createElement('tr');
+                
+                fields.forEach(field => {
+                    const td = document.createElement('td');
+                    let value = record[field];
+                    
+                    // Formatear valores largos
+                    if (typeof value === 'string' && value.length > 50) {
+                        value = value.substring(0, 50) + '...';
+                    }
+                    
+                    td.textContent = value || '';
+                    td.title = record[field] || '';
+                    tr.appendChild(td);
+                });
+                
+                previewBody.appendChild(tr);
+            });
+            
+            previewContainer.style.display = 'block';
+        }
+        
+        // Verificar si el equipo ya existe
+        async function checkIfExists(record) {
+            try {
+                // Buscar por ID
+                if (record.ID) {
+                    const q1 = query(collection(db, "equipos"), where("ID", "==", record.ID));
+                    const snap1 = await getDocs(q1);
+                    if (!snap1.empty) return { exists: true, field: 'ID', value: record.ID };
+                }
+                
+                // Buscar por No. SERIE
+                if (record['No. SERIE']) {
+                    const q2 = query(collection(db, "equipos"), where("No. SERIE", "==", record['No. SERIE']));
+                    const snap2 = await getDocs(q2);
+                    if (!snap2.empty) return { exists: true, field: 'No. SERIE', value: record['No. SERIE'] };
+                }
+                
+                return { exists: false };
+            } catch (error) {
+                console.error('Error checking existence:', error);
+                return { exists: false, error: error.message };
+            }
+        }
+        
+        // Iniciar importación
+        btnImport.addEventListener('click', async () => {
+            if (!validRecords || validRecords.length === 0) {
+                alert('❌ No hay registros válidos para importar');
+                return;
+            }
+            
+            if (!window.db) {
+                alert('❌ Firebase no está inicializado');
+                return;
+            }
+            
+            if (!confirm(`⚠️ Estás a punto de importar ${validRecords.length} registros.\n\n¿Deseas continuar?`)) {
+                return;
+            }
+            
+            // Iniciar importación
+            await startImport();
+        });
+        
+        // Proceso de importación
+        async function startImport() {
+            btnImport.disabled = true;
+            progressContainer.style.display = 'block';
+            logArea.style.display = 'block';
+            
+            let imported = 0;
+            let skipped = 0;
+            let errors = 0;
+            
+            log(`🚀 Iniciando importación de ${validRecords.length} registros...`, 'info');
+            
+            for (let i = 0; i < validRecords.length; i++) {
+                const record = validRecords[i];
+                const progress = Math.round(((i + 1) / validRecords.length) * 100);
+                
+                progressFill.style.width = progress + '%';
+                progressFill.textContent = progress + '%';
+                progressText.textContent = `Procesando ${i + 1} de ${validRecords.length}...`;
+                
+                try {
+                    // Verificar si ya existe
+                    const existsCheck = await checkIfExists(record);
+                    
+                    if (existsCheck.exists) {
+                        log(`⚠️ Omitido: ${record.ID || 'Sin ID'} - Ya existe (${existsCheck.field}: ${existsCheck.value})`, 'warning');
+                        skipped++;
+                        continue;
+                    }
+                    
+                    // Preparar documento para Firebase
+                    const firebaseDoc = {
+                        ...record,
+                        fechaImportacion: serverTimestamp(),
+                        fuente: 'Importación JSON',
+                        usuarioImportador: 'admin', // En un sistema real, esto vendría del usuario autenticado
+                        estado: 'activo'
+                    };
+                    
+                    // Agregar a Firebase
+                    await addDoc(collection(db, "equipos"), firebaseDoc);
+                    
+                    imported++;
+                    log(`✅ Importado: ${record.ID || 'Sin ID'} - ${record['NOMBRE DEL EQUIPO']?.substring(0, 50) || 'Sin nombre'}`, 'success');
+                    
+                } catch (error) {
+                    errors++;
+                    console.error('Error importing record:', error);
+                    log(`❌ Error importando registro ${i + 1}: ${error.message}`, 'error');
+                }
+                
+                // Pequeña pausa para evitar sobrecargar Firebase
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            // Finalizar
+            progressText.textContent = '¡Importación completada!';
+            log(`\n========================================`, 'info');
+            log(`📊 RESUMEN DE IMPORTACIÓN:`, 'info');
+            log(`✅ Importados exitosamente: ${imported}`, 'success');
+            log(`⚠️ Omitidos (duplicados): ${skipped}`, 'warning');
+            log(`❌ Errores: ${errors}`, 'error');
+            log(`========================================\n`, 'info');
+            
+            // Crear registro de actividad
+            try {
+                await addDoc(collection(db, "importaciones"), {
+                    fecha: serverTimestamp(),
+                    archivo: fileName.textContent,
+                    totalRegistros: validRecords.length,
+                    importados: imported,
+                    omitidos: skipped,
+                    errores: errors,
+                    usuario: 'admin',
+                    tipo: 'JSON'
+                });
+                
+                log(`📝 Registro de actividad guardado en Firebase`, 'info');
+            } catch (error) {
+                log(`⚠️ No se pudo guardar el registro de actividad: ${error.message}`, 'warning');
+            }
+            
+            // Mostrar resumen
+            setTimeout(() => {
+                alert(`✅ Importación completada!\n\n• ✅ Importados: ${imported}\n• ⚠️ Omitidos: ${skipped}\n• ❌ Errores: ${errors}\n\nLos datos ahora están disponibles en el sistema principal.`);
+                
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }, 500);
+        }
+        
+        // Cargar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            log('✅ Sistema de importación JSON listo', 'success');
+            log('Selecciona o arrastra un archivo JSON para comenzar', 'info');
+        });
+    </script>
 </body>
 </html>
