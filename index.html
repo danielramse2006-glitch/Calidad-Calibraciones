@@ -350,17 +350,6 @@
             gap: 10px;
         }
         
-        .file-upload {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        #fileInput {
-            flex: 1;
-        }
-        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -414,12 +403,9 @@
                 <div class="search-box">
                     <input type="text" id="searchInput" placeholder="Buscar por ID, Nombre del Equipo, No. Serie...">
                 </div>
-                <div class="file-upload">
-                    <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="loadExcelFile(event)">
-                    <button class="btn btn-primary" onclick="downloadExcel()">
-                        📥 Descargar Excel
-                    </button>
-                </div>
+                <button class="btn btn-primary" onclick="downloadExcel()">
+                    📥 Descargar Excel
+                </button>
             </div>
             
             <!-- Contenedor de filtros -->
@@ -514,7 +500,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                     <h3>No hay datos cargados</h3>
-                                    <p>Selecciona un archivo Excel para comenzar</p>
+                                    <p>Los datos se cargarán automáticamente desde el Excel del repositorio</p>
                                 </div>
                             </td>
                         </tr>
